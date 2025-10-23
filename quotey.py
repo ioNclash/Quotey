@@ -26,7 +26,7 @@ try:
 
     # load font
     font15 = ImageFont.truetype(os.path.join(fontdir, 'Font.ttc'), 15)
-    font24 = ImageFont.truetype(os.path.join(fontdir, 'Font.ttc'), 24)
+    font10 = ImageFont.truetype(os.path.join(fontdir, 'Font.ttc'), 10)
 
     #Display Quote
     logging.info("Showing quote on e-Paper")
@@ -42,7 +42,7 @@ try:
     author = choice['author']
 
     draw.text((0,60), quote, font = font15, fill = 0)
-    draw.text((0,30), f"- {author}, {source}", font = font24, fill = 0)
+    draw.text((0,30), f"- {author}, {source}", font = font10, fill = 0)
     # image = image.rotate(180) # Uncomment this line if your display is upside down
     epd.display(epd.getbuffer(image))
     epd.sleep()
