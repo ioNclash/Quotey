@@ -41,8 +41,8 @@ try:
     source = choice['source']
     author = choice['author']
 
-    draw.text((0,60), quote, font = font15, fill = 0)
-    draw.text((0,30), f"- {author}, {source}", font = font10, fill = 0)
+    draw.text((0,30), quote, font = font15, fill = 0)
+    draw.text((0,60), f"- {author}, {source}", font = font10, fill = 0)
     # image = image.rotate(180) # Uncomment this line if your display is upside down
     epd.display(epd.getbuffer(image))
     epd.sleep()
