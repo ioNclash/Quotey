@@ -1,7 +1,7 @@
 import sys
 import os
 
-fontdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'font')
+fontdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
 libdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib')
 if os.path.exists(libdir):
     sys.path.append(libdir)
@@ -31,7 +31,7 @@ try:
     image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame    
     draw = ImageDraw.Draw(image)
     quote = "It's not a bug, it's a feature"
-    draw.text(120,60, quote, font = font24, fill = 0)
+    draw.text((0,60), quote, font = font15, fill = 0)
     epd.display(epd.getbuffer(image))
     epd.sleep()
 
