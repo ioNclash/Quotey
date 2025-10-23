@@ -11,6 +11,8 @@ import epd2in13_V4
 import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
+import json
+import random
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -30,8 +32,18 @@ try:
     logging.info("Showing quote on e-Paper")
     image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame    
     draw = ImageDraw.Draw(image)
-    quote = "It's not a bug, it's a feature"
+    
+    #Load random quote from json
+    with open('quotes.json', 'r') as f:
+        quotes = json.load(f)
+    choice = random.choice(quotes['quotes'])
+    quote = choice['quote']
+    source = choice['source']
+    author = choice['author']
+
     draw.text((0,60), quote, font = font15, fill = 0)
+    draw.text((0,30), f"- {author}, {source}", font = font24, fill = 0)
+    # image = image.rotate(180) # Uncomment this line if your display is upside down
     epd.display(epd.getbuffer(image))
     epd.sleep()
 
