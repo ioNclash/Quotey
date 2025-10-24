@@ -13,8 +13,33 @@ from PIL import Image,ImageDraw,ImageFont
 import traceback
 import json
 import random
+import textwrap
 
 logging.basicConfig(level=logging.DEBUG)
+
+def wrap_text(text,box,font_path,max_font_size=20,min_font_size=80,line_spacing=1.1):
+    x0, y0, x1, y1 = box
+    box_width = x1 - x0
+    box_height = y1 - y0
+
+    for font_size in range(max_font_size, min_font_size - 1, -1):
+        font = ImageFont.truetype(font_path, font_size)
+        lines = []
+        line_height = font.getsize("A")[1]
+        max_lines = box_height // int(line_height * line_spacing)
+
+        wrapped_lines = textwrap.wrap(text, width=100)
+        for line in wrapped_lines:
+            line_width, _ = font.getsize(line)
+            if line_width <= box_width:
+                lines.append(line)
+            else:
+                sub_lines = textwrap.wrap(line, width=int(len(line) * box_width / line_width))
+                lines.extend(sub_lines)
+
+        if len(lines) <= max_lines:
+            return lines, font
+    return None, None
 
 try:
     #Initialize and Clear e-Paper display
@@ -23,10 +48,6 @@ try:
     logging.info("init and Clear")
     epd.init()
     epd.Clear(0xFF)
-
-    # load font
-    font15 = ImageFont.truetype(os.path.join(fontdir, 'Font.ttc'), 15)
-    font10 = ImageFont.truetype(os.path.join(fontdir, 'Font.ttc'), 10)
 
     #Display Quote
     logging.info("Showing quote on e-Paper")
@@ -37,12 +58,21 @@ try:
     with open('quotes.json', 'r') as f:
         quotes = json.load(f)
     choice = random.choice(quotes['quotes'])
-    quote = choice['quote']
+    quote = "I am testing that my text can properly wrap itself around the screen without collision issues"#choice['quote']
     source = choice['source']
     author = choice['author']
 
-    draw.text((0,30), quote, font = font15, fill = 0)
-    draw.text((0,60), f"- {author}, {source}", font = font10, fill = 0)
+    #Wrap text to fit screen
+    quote_box = (0, 0, epd.height-5, epd.width - 50)
+    source_box = (0, epd.width - 50, epd.height-5, epd.width)
+
+    wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
+    wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
+
+    draw.multiline_text((quote_box[0], quote_box[1]),wrapped_quote, font=quote_font, fill=0, spacing=2)
+    draw.multiline_text((source_box[0], source_box[1]),wrapped_source, font=source_font, fill=0, spacing=2)
+
+   
     # image = image.rotate(180) # Uncomment this line if your display is upside down
     epd.display(epd.getbuffer(image))
     epd.sleep()
