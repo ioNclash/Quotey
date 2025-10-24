@@ -146,7 +146,7 @@ try:
     wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
 
     logging.info(f"Wrapped quote lines: {wrapped_quote}")
-    draw_wrapped_text(draw, wrapped_quote, quote_box, quote_font, fill=0, line_spacing=1.2, align="centre")
+    draw_wrapped_text(draw, wrapped_quote, quote_box, quote_font, fill=0, line_spacing=1.2, align="center")
     logging.info(f"Wrapped source lines: {wrapped_source}")
     draw_wrapped_text(draw, wrapped_source, source_box, source_font, fill=0, line_spacing=1.2, align="right")
 
