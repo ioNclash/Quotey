@@ -115,6 +115,13 @@ def draw_wrapped_text(draw,text,box,font,fill=0,line_spacing=2,align="left"):
             x = x0
         draw.text((x, y), line, font=font, fill=fill)
         y += line_height
+        
+def clear_screen():
+    logging.info("Clearing e-Paper display")
+    epd = epd2in13_V4.EPD()
+    epd.init()
+    epd.Clear(0xFF)
+    epd2in13_V4.epdconfig.module_exit(cleanup=True)
 
 def show_quote():
     try:
@@ -140,8 +147,8 @@ def show_quote():
         author = choice['author']
 
         #Wrap text to fit screen
-        quote_box = (0, 0, epd.height-5, epd.width-50)
-        source_box = (0, epd.width - 45, epd.height-5, epd.width)
+        quote_box = (0, 0, epd.height-5, epd.width-45)
+        source_box = (0, epd.width - 40, epd.height-5, epd.width)
 
         wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
         wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
