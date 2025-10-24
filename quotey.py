@@ -126,7 +126,7 @@ try:
     with open('quotes.json', 'r') as f:
         quotes = json.load(f)
     choice = random.choice(quotes['quotes'])
-    quote = "M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M"#choice['quote']
+    quote = choice['quote']
     source = choice['source']
     author = choice['author']
 
@@ -138,9 +138,9 @@ try:
     wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
 
     logging.info(f"Wrapped quote lines: {wrapped_quote}")
-    draw.multiline_text((quote_box[0], quote_box[1]),"\n".join(wrapped_quote), font=quote_font, fill=0, spacing=2)
+    draw.multiline_text((quote_box[0], quote_box[1]),"\n".join(wrapped_quote), font=quote_font, fill=0, spacing=2,align="center")
     logging.info(f"Wrapped source lines: {wrapped_source}")
-    draw.multiline_text((source_box[0], source_box[1]),"\n".join(wrapped_source), font=source_font, fill=0, spacing=2)
+    draw.multiline_text((source_box[0], source_box[1]),"\n".join(wrapped_source), font=source_font, fill=0, spacing=2,align="right")
 
    
     # image = image.rotate(180) # Uncomment this line if your display is upside down
