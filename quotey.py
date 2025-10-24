@@ -48,7 +48,8 @@ def wrap_text(text, box, font_path, max_font_size=20, min_font_size=8, line_spac
         if len(lines) <= max_lines:
             return lines, font
 
-    return None, None
+    logging.warning("Could not fit text within box with given font size constraints.")
+    return ["Broken Bounds"], ImageFont.truetype(font_path, min_font_size)
 
 
 try:
@@ -61,7 +62,8 @@ try:
 
     #Display Quote
     logging.info("Showing quote on e-Paper")
-    image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame    
+    image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame  
+    logging.info(f"Image size: {image.size}")  
     draw = ImageDraw.Draw(image)
     
     #Load random quote from json
