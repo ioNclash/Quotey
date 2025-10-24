@@ -80,17 +80,6 @@ def wrap_text(text, box, font_path, max_font_size=20, min_font_size=8, line_spac
     return ["Broken Bounds"], ImageFont.truetype(font_path, min_font_size)
 
 def break_word(word, max_width, font):
-    """
-    Break a single word into multiple lines based on character-by-character measurement.
-    
-    Args:
-        word: The word to break
-        max_width: Maximum width in pixels
-        font: Font object to use for measurement
-    
-    Returns:
-        List of word fragments
-    """
     lines = []
     current = ""
     
@@ -107,6 +96,25 @@ def break_word(word, max_width, font):
         lines.append(current)
     
     return lines if lines else [""]
+
+def draw_wrapped_text(draw,text,box,font,fill=0,line_spacing=2,align="left"):
+    x0,y0,x1,y1 = box
+    box_width = x1 - x0
+
+    bbox = font.getbbox("Ay")  # Use char with ascender and descender
+    line_height = (bbox[3] - bbox[1]) * line_spacing
+    y=y0
+
+    for line in text:
+        line_width = font.getlength(line)
+        if align == "center":
+            x = x0 + (box_width - line_width) / 2
+        elif align == "right":
+            x = x1 - line_width
+        else:  # left
+            x = x0
+        draw.text((x, y), line, font=font, fill=fill)
+        y += line_height
 
 try:
     #Initialize and Clear e-Paper display
@@ -138,9 +146,9 @@ try:
     wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
 
     logging.info(f"Wrapped quote lines: {wrapped_quote}")
-    draw.multiline_text((quote_box[0], quote_box[1]),"\n".join(wrapped_quote), font=quote_font, fill=0, spacing=2,align="center")
+    draw_wrapped_text(draw, wrapped_quote, quote_box, quote_font, fill=0, line_spacing=1.2, align="centre")
     logging.info(f"Wrapped source lines: {wrapped_source}")
-    draw.multiline_text((source_box[0], source_box[1]),"\n".join(wrapped_source), font=source_font, fill=0, spacing=2,align="right")
+    draw_wrapped_text(draw, wrapped_source, source_box, source_font, fill=0, line_spacing=1.2, align="right")
 
    
     # image = image.rotate(180) # Uncomment this line if your display is upside down
