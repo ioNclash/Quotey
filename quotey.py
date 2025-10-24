@@ -116,55 +116,55 @@ def draw_wrapped_text(draw,text,box,font,fill=0,line_spacing=2,align="left"):
         draw.text((x, y), line, font=font, fill=fill)
         y += line_height
 
-try:
-    #Initialize and Clear e-Paper display
-    logging.info("Starting e-Paper quote display")
-    epd = epd2in13_V4.EPD()
-    logging.info("init and Clear")
-    epd.init()
-    epd.Clear(0xFF)
+def show_quote():
+    try:
+        #Initialize and Clear e-Paper display
+        logging.info("Starting e-Paper quote display")
+        epd = epd2in13_V4.EPD()
+        logging.info("init and Clear")
+        epd.init()
+        epd.Clear(0xFF)
 
-    #Display Quote
-    logging.info("Showing quote on e-Paper")
-    image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame  
-    logging.info(f"Image size: {image.size}")  
-    draw = ImageDraw.Draw(image)
+        #Display Quote
+        logging.info("Showing quote on e-Paper")
+        image = Image.new('1', (epd.height, epd.width), 255)  # 255: clear the frame  
+        logging.info(f"Image size: {image.size}")  
+        draw = ImageDraw.Draw(image)
+        
+        #Load random quote from json
+        with open('quotes.json', 'r') as f:
+            quotes = json.load(f)
+        choice = random.choice(quotes['quotes'])
+        quote = choice['quote']
+        source = choice['source']
+        author = choice['author']
+
+        #Wrap text to fit screen
+        quote_box = (0, 0, epd.height-5, epd.width-50)
+        source_box = (0, epd.width - 45, epd.height-5, epd.width)
+
+        wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
+        wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
+
+        logging.info(f"Wrapped quote lines: {wrapped_quote}")
+        draw_wrapped_text(draw, wrapped_quote, quote_box, quote_font, fill=0, line_spacing=1.2, align="center")
+        logging.info(f"Wrapped source lines: {wrapped_source}")
+        draw_wrapped_text(draw, wrapped_source, source_box, source_font, fill=0, line_spacing=1.2, align="right")
+
     
-    #Load random quote from json
-    with open('quotes.json', 'r') as f:
-        quotes = json.load(f)
-    choice = random.choice(quotes['quotes'])
-    quote = choice['quote']
-    source = choice['source']
-    author = choice['author']
-
-    #Wrap text to fit screen
-    quote_box = (0, 0, epd.height-5, epd.width-50)
-    source_box = (0, epd.width - 45, epd.height-5, epd.width)
-
-    wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
-    wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
-
-    logging.info(f"Wrapped quote lines: {wrapped_quote}")
-    draw_wrapped_text(draw, wrapped_quote, quote_box, quote_font, fill=0, line_spacing=1.2, align="center")
-    logging.info(f"Wrapped source lines: {wrapped_source}")
-    draw_wrapped_text(draw, wrapped_source, source_box, source_font, fill=0, line_spacing=1.2, align="right")
-
-   
-    # image = image.rotate(180) # Uncomment this line if your display is upside down
-    epd.display(epd.getbuffer(image))
-    epd.sleep()
-
-    time.sleep(15)
-    logging.info("Done")
-    epd.init()
-    epd.Clear(0xFF)
-    epd2in13_V4.epdconfig.module_exit(cleanup=True)
+        image = image.rotate(180) # Uncomment this line if your display is upside down
+        epd.display(epd.getbuffer(image))
+        epd.sleep()
+        logging.info("Display complete")
+        epd2in13_V4.epdconfig.module_exit(cleanup=True)
 
 
-except IOError as e:
-    logging.info(e)
-except KeyboardInterrupt:
-    logging.info("ctrl + c:")
-    epd2in13_V4.epdconfig.module_exit()
-    exit()
+    except IOError as e:
+        logging.info(e)
+    except KeyboardInterrupt:
+        logging.info("ctrl + c:")
+        epd2in13_V4.epdconfig.module_exit()
+        exit()
+
+if __name__ == "__main__":
+    show_quote()
