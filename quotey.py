@@ -73,13 +73,15 @@ try:
     author = choice['author']
 
     #Wrap text to fit screen
-    quote_box = (0, 0, epd.height-5, epd.width - 50)
+    quote_box = (0, 0, epd.height-5, epd.width-5)
     source_box = (0, epd.width - 50, epd.height-5, epd.width)
 
     wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
     wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
 
+    logging.info(f"Wrapped quote lines: {wrapped_quote}")
     draw.multiline_text((quote_box[0], quote_box[1]),"\n".join(wrapped_quote), font=quote_font, fill=0, spacing=2)
+    logging.info(f"Wrapped source lines: {wrapped_source}")
     draw.multiline_text((source_box[0], source_box[1]),"\n".join(wrapped_source), font=source_font, fill=0, spacing=2)
 
    
