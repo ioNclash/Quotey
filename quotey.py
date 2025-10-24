@@ -76,9 +76,6 @@ def wrap_text(text, box, font_path, max_font_size=20, min_font_size=8, line_spac
     font = ImageFont.truetype(font_path, min_font_size)
     return lines[:max_lines], font  # Return truncated lines
 
-    logging.warning("Could not fit text within box with given font size constraints.")
-    return ["Broken Bounds"], ImageFont.truetype(font_path, min_font_size)
-
 def break_word(word, max_width, font):
     lines = []
     current = ""
@@ -115,13 +112,28 @@ def draw_wrapped_text(draw,text,box,font,fill=0,line_spacing=2,align="left"):
             x = x0
         draw.text((x, y), line, font=font, fill=fill)
         y += line_height
-        
+
 def clear_screen():
     logging.info("Clearing e-Paper display")
     epd = epd2in13_V4.EPD()
     epd.init()
     epd.Clear(0xFF)
     epd2in13_V4.epdconfig.module_exit(cleanup=True)
+    with open('current_quote.json', 'w') as f:
+        json.dump({"current_quote": "No quote being shown"}, f, indent=4)
+
+def get_random_quote():
+    #Load random quote from json
+        with open('quotes.json', 'r') as f:
+            quotes = json.load(f)
+        choice = random.choice(quotes['quotes'])
+        quote = choice['quote']
+        source = choice['source']
+        author = choice['author']
+
+        with open('current_quote.json', 'w') as f:
+            json.dump({"current_quote": quote}, f, indent=4)
+        return quote, source, author    
 
 def show_quote():
     try:
@@ -138,17 +150,11 @@ def show_quote():
         logging.info(f"Image size: {image.size}")  
         draw = ImageDraw.Draw(image)
         
-        #Load random quote from json
-        with open('quotes.json', 'r') as f:
-            quotes = json.load(f)
-        choice = random.choice(quotes['quotes'])
-        quote = choice['quote']
-        source = choice['source']
-        author = choice['author']
+        quote, source, author = get_random_quote()
 
         #Wrap text to fit screen
-        quote_box = (0, 0, epd.height-5, epd.width-45)
-        source_box = (0, epd.width - 40, epd.height-5, epd.width)
+        quote_box = (0, 0, epd.height-5, epd.width-40)
+        source_box = (0, epd.width - 353, epd.height-5, epd.width)
 
         wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
         wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
@@ -159,7 +165,7 @@ def show_quote():
         draw_wrapped_text(draw, wrapped_source, source_box, source_font, fill=0, line_spacing=1.2, align="right")
 
     
-        image = image.rotate(180) # Uncomment this line if your display is upside down
+        image = image.rotate(180) # Comment this line if your display is upside down
         epd.display(epd.getbuffer(image))
         epd.sleep()
         logging.info("Display complete")
