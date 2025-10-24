@@ -13,7 +13,7 @@ from PIL import Image,ImageDraw,ImageFont
 import traceback
 import json
 import random
-import textwrap
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -21,36 +21,92 @@ def wrap_text(text, box, font_path, max_font_size=20, min_font_size=8, line_spac
     x0, y0, x1, y1 = box
     box_width = x1 - x0
     box_height = y1 - y0
-
+    
     for font_size in range(max_font_size, min_font_size - 1, -1):
         font = ImageFont.truetype(font_path, font_size)
-
-        # Estimate line height using getbbox
-        bbox = font.getbbox("A")
-        line_height = bbox[3] - bbox[1]
-        max_lines = int(box_height // (line_height * line_spacing))
-
+        
+        # Get accurate line height
+        bbox = font.getbbox("Ay")  # Use char with ascender and descender
+        line_height = (bbox[3] - bbox[1]) * line_spacing
+        max_lines = int(box_height / line_height)
+        
+        # Split text into words
+        words = text.split()
         lines = []
-        # Estimate average char width for wrapping
-        avg_char_width = font.getlength("M")
-        est_chars_per_line = max(1, int(box_width / avg_char_width))
-        wrapped_lines = textwrap.wrap(text, width=est_chars_per_line)
-
-        for line in wrapped_lines:
-            line_width = font.getlength(line)
-            if line_width <= box_width:
-                lines.append(line)
+        current_line = []
+        
+        for word in words:
+            # Test if adding this word exceeds the width
+            test_line = " ".join(current_line + [word])
+            test_width = font.getlength(test_line)
+            
+            if test_width <= box_width:
+                # Word fits, add it to current line
+                current_line.append(word)
             else:
-                # If still too long, wrap again with finer width
-                sub_lines = textwrap.wrap(line, width=int(len(line) * box_width / line_width))
-                lines.extend(sub_lines)
-
+                # Word doesn't fit
+                if current_line:
+                    # Save current line and start new one
+                    lines.append(" ".join(current_line))
+                    current_line = [word]
+                    
+                    # Check if word itself is too long
+                    if font.getlength(word) > box_width:
+                        # Need to break the word
+                        broken_word = current_line.pop()
+                        char_lines = break_word(broken_word, box_width, font)
+                        lines.extend(char_lines[:-1])
+                        current_line = [char_lines[-1]] if char_lines[-1] else []
+                else:
+                    # First word is too long, must break it
+                    char_lines = break_word(word, box_width, font)
+                    lines.extend(char_lines[:-1])
+                    current_line = [char_lines[-1]] if char_lines[-1] else []
+        
+        # Add remaining words
+        if current_line:
+            lines.append(' '.join(current_line))
+        
+        # Check if all lines fit
         if len(lines) <= max_lines:
             return lines, font
+    
+    # If we get here, even min font size doesn't fit
+    logging.warning("Could not fit text within box with given font size constraints.")
+    font = ImageFont.truetype(font_path, min_font_size)
+    return lines[:max_lines], font  # Return truncated lines
 
     logging.warning("Could not fit text within box with given font size constraints.")
     return ["Broken Bounds"], ImageFont.truetype(font_path, min_font_size)
 
+def break_word(word, max_width, font):
+    """
+    Break a single word into multiple lines based on character-by-character measurement.
+    
+    Args:
+        word: The word to break
+        max_width: Maximum width in pixels
+        font: Font object to use for measurement
+    
+    Returns:
+        List of word fragments
+    """
+    lines = []
+    current = ""
+    
+    for char in word:
+        test = current + char
+        if font.getlength(test) <= max_width:
+            current += char
+        else:
+            if current:
+                lines.append(current)
+            current = char
+    
+    if current:
+        lines.append(current)
+    
+    return lines if lines else [""]
 
 try:
     #Initialize and Clear e-Paper display
@@ -70,7 +126,7 @@ try:
     with open('quotes.json', 'r') as f:
         quotes = json.load(f)
     choice = random.choice(quotes['quotes'])
-    quote = "I am testing that my text can properly wrap itself around the screen without collision issues"#choice['quote']
+    quote = "M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M M"#choice['quote']
     source = choice['source']
     author = choice['author']
 
