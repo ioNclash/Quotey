@@ -3,6 +3,8 @@ import os
 
 fontdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
 libdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib')
+QUOTES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'quotes.json')
+CURRENT_QUOTE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current_quote.json')
 if os.path.exists(libdir):
     sys.path.append(libdir)
 
@@ -119,19 +121,19 @@ def clear_screen():
     epd.init()
     epd.Clear(0xFF)
     epd2in13_V4.epdconfig.module_exit(cleanup=True)
-    with open('current_quote.json', 'w') as f:
+    with open(CURRENT_QUOTE_FILE, 'w') as f:
         json.dump({"current_quote": "No quote being shown"}, f, indent=4)
 
 def get_random_quote():
     #Load random quote from json
-        with open('quotes.json', 'r') as f:
+        with open(QUOTES_FILE, 'r') as f:
             quotes = json.load(f)
         choice = random.choice(quotes['quotes'])
         quote = choice['quote']
         source = choice['source']
         author = choice['author']
 
-        with open('current_quote.json', 'w') as f:
+        with open(CURRENT_QUOTE_FILE, 'w') as f:
             json.dump({"current_quote": quote}, f, indent=4)
         return quote, source, author    
 
