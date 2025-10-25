@@ -154,7 +154,7 @@ def show_quote():
 
         #Wrap text to fit screen
         quote_box = (0, 0, epd.height-5, epd.width-40)
-        source_box = (0, epd.width - 353, epd.height-5, epd.width)
+        source_box = (0, epd.width - 35, epd.height-5, epd.width)
 
         wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
         wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
