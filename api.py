@@ -19,11 +19,10 @@ def getQuotes():
 @app.route("/quotes", methods=["POST"])
 def addQuote():
     if request.method == "POST":
-        # Get form data
-        quote = request.form.get("quote")
-        source = request.form.get("source")
-        author = request.form.get("author")
-        
+        payload = request.get_json()
+        quote = payload.get("quote")
+        source = payload.get("source")
+        author = payload.get("author")
         try:
             # Read existing quotes
             with open('quotes.json', 'r') as f:

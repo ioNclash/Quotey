@@ -1,14 +1,15 @@
 { "quotes": [
-        {"quote":"Test Quote",
-        "source":"Test Source", 
-        "author":"Test Author"
+        {"quote":"I am getting up for a man's work. Do I resent going out to do what I was born for, or was i created to wrap myself in blankets and keep warm. Look into nature, we are created for both feeling and action",
+        "source":"Meditations", 
+        "author":"Marcus Aurelius"
+        }, 
+        {"quote":"I can not be harmed by and should not harm the ignorant of true good and evil",
+        "source":"Meditations", 
+        "author":"Marcus Aurelius"
         },
-    {"quote":"Test Quote2",
-        "source":"Test Source2", 
-        "author":"Test Author2"
-        },
-    {"quote":"Test Quote3",
-        "source":"Test Source3", 
-        "author":"Test Author3"
-        }]
+        {"quote":"Life for each of us is a mere moment, and this life of yours is nearly over, while you show yourself no honour but let your own welfare depend on other people's souls",
+        "source":"Meditations", 
+        "author":"Marcus Aurelius"
+        }
+        ]
 }
