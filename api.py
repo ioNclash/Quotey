@@ -1,18 +1,21 @@
 from flask import Flask
 import json
 from flask import request
+import os
+QUOTES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'quotes.json')
+CURRENT_QUOTE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current_quote.json')
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def getCurrentQuote():
-    with open('current_quote.json', 'r') as f:
+    with open(CURRENT_QUOTE_FILE, 'r') as f:
         data = json.load(f)
     return {"status":"success","current_quote": data['current_quote']}
 
 @app.route("/quotes", methods=["GET"])
 def getQuotes():
-    with open('quotes.json', 'r') as f:
+    with open(QUOTES_FILE, 'r') as f:
         data = json.load(f)
     return {"status":"success","quotes": data['quotes']}
 
@@ -25,7 +28,7 @@ def addQuote():
         author = payload.get("author")
         try:
             # Read existing quotes
-            with open('quotes.json', 'r') as f:
+            with open(QUOTES_FILE, 'r') as f:
                 data = json.load(f)
             
             # Add new quote to the quotes array
@@ -36,7 +39,7 @@ def addQuote():
             })
             
             # Write updated quotes back to file
-            with open('quotes.json', 'w') as f:
+            with open(QUOTES_FILE, 'w') as f:
                 json.dump(data, f, indent=4)
             
             return {"status": "success", "message": "Quote added successfully"}, 200
