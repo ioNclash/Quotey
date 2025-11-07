@@ -19,7 +19,7 @@ fi
 
 # Create current_quote.json if it doesn't exist
 if [ ! -f "$CURRENT_QUOTE_FILE" ]; then
-    echo '{"quotation":"","author":"","source":""}' > "$CURRENT_QUOTE_FILE"
+    echo "{}" > "$CURRENT_QUOTE_FILE"
     echo "FILE $CURRENT_QUOTE_FILE created."
 else
     echo "FILE $CURRENT_QUOTE_FILE already exists."
