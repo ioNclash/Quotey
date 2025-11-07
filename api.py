@@ -71,7 +71,7 @@ def setQuotes():
         # Write updated quotes back to file
         with open(QUOTES_FILE, 'w') as f:
             json.dump(quotes,f)
-        return {"status": "success", "message": "Quote added successfully"}, 200
+        return {"status": "success", "message": "Quotes replaced successfully"}, 200
 
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
