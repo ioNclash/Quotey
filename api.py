@@ -7,23 +7,23 @@ CURRENT_QUOTE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'c
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET"]) 
 def getCurrentQuote():
     with open(CURRENT_QUOTE_FILE, 'r') as f:
         data = json.load(f)
-    return {"status":"success","current_quote": data['current_quote']}
+    return {"status":"success","quote": data}
 
 @app.route("/quotes", methods=["GET"])
 def getQuotes():
     with open(QUOTES_FILE, 'r') as f:
         data = json.load(f)
-    return {"status":"success","quotes": data['quotes']}
+    return {"status":"success","quotes": data}
 
 @app.route("/quotes", methods=["POST"])
 def addQuote():
     if request.method == "POST":
         payload = request.get_json()
-        quote = payload.get("quote")
+        quote_text = payload.get("quote_text")
         source = payload.get("source")
         author = payload.get("author")
         try:
@@ -32,8 +32,8 @@ def addQuote():
                 data = json.load(f)
             
             # Add new quote to the quotes array
-            data['quotes'].append({
-                "quote": quote,
+            data.append({
+                "quote_text": quote_text,
                 "source": source,
                 "author": author
             })

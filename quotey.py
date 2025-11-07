@@ -122,21 +122,14 @@ def clear_screen():
     epd.Clear(0xFF)
     epd2in13_V4.epdconfig.module_exit(cleanup=True)
     with open(CURRENT_QUOTE_FILE, 'w') as f:
-        json.dump({"current_quote": "No quote being shown"}, f, indent=4)
+        json.dump({"quotation":"","source":"","author":""}, f)
 
 def get_random_quote():
     #Load random quote from json
         with open(QUOTES_FILE, 'r') as f:
             quotes = json.load(f)
-        choice = random.choice(quotes['quotes'])
-        quote = choice['quote']
-        source = choice['source']
-        author = choice['author']
-
-        with open(CURRENT_QUOTE_FILE, 'w') as f:
-            json.dump({"current_quote": quote}, f, indent=4)
-        return quote, source, author    
-
+            quote = random.choice(quotes) 
+        return quote
 def show_quote():
     try:
         #Initialize and Clear e-Paper display
@@ -152,13 +145,21 @@ def show_quote():
         logging.info(f"Image size: {image.size}")  
         draw = ImageDraw.Draw(image)
         
-        quote, source, author = get_random_quote()
+        quote_object = get_random_quote()
+
+        with open(CURRENT_QUOTE_FILE, 'w') as f: #UPDATE CURRENT QUOTE
+            json.dump(quote_object, f)
+    
+    
+        quotation = quote_object['quotation']
+        source = quote_object['source']
+        author = quote_object['author']
 
         #Wrap text to fit screen
         quote_box = (0, 0, epd.height-5, epd.width-40)
         source_box = (0, epd.width - 35, epd.height-5, epd.width)
 
-        wrapped_quote, quote_font = wrap_text(quote, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
+        wrapped_quote, quote_font = wrap_text(quotation, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
         wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
 
         logging.info(f"Wrapped quote lines: {wrapped_quote}")
