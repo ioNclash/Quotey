@@ -1,7 +1,6 @@
 import sys
 import os
 import logging
-import epd2in13_V4
 import time
 from PIL import Image,ImageDraw,ImageFont
 import json
@@ -20,6 +19,8 @@ else:
 if not os.path.exists(QUOTES_FILE):
     logging.error("Quotes file not found")
     raise FileNotFoundError("Quotes file not found")
+
+import epd2in13_V4
 
 logging.basicConfig(level=logging.DEBUG)
 
