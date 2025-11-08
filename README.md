@@ -1,4 +1,6 @@
 # Quotey
+<img width="2607" height="1544" alt="image" src="https://github.com/user-attachments/assets/a2ef8581-86e9-4286-ae70-0fafbde5fd7e" />
+
 A low power device to display impactful messages daily. 
 Upload a set of quotes to the device and see it change to display a new quote each day!
 Dynamically add new quotes by interfacing with a preloaded API
