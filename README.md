@@ -76,8 +76,13 @@ The API has 5 uses:
 /quotes POST - Replaces the contents of quote.json with the payload. payload should be in the format quotes: with an array of quote objects
 
 You can integrate the API with any platform you see fit, or use curl or postman if you feel like avoiding the hastle
+Once you have populated the quotes json you can run
+```bash
+python3 quotey.py
+```
+To display your first quote, or just wait till midnight for the cycle to start!
 #### Home Assistant Integration
-To use the API, i built a home assistant integration to show me the daily quote on my dashboard and add quotes through a series of input boxes
+To use the API, i built a home assistant integration to show me the daily quote on my dashboard and add quotes through a series of input boxes <br>
 <img width="583" height="571" alt="image" src="https://github.com/user-attachments/assets/ba399d06-25f5-41d3-9725-b513a1ac09bb" />
 
 **Configuration.yaml**
