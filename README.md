@@ -82,7 +82,7 @@ To use the API, i built a home assistant integration to show me the daily quote 
 
 **Configuration.yaml**
 ```yaml
-REST sensor to show current quote
+# REST sensor to show current quote
 sensor:
   - platform: rest
     name: Current Quote
@@ -110,12 +110,15 @@ input_text:
   quote_source:
     name: Quote Source
     max: 100
-
+input_button:
+  submit_quote:
+    name: Submit Quote
+    icon: mdi:send
 
 # REST command to post quote    
 rest_command:
   add_quote:
-    url: "http://IP ADDR/quote"
+    url: "http://IP ADDR:5000/quote"
     method: POST
     headers:
       Content-Type: application/json
@@ -126,32 +129,35 @@ rest_command:
         "source": "{{ source }}"
       }
 ```
-**scripts.yaml**
+**Automation**
 ```yaml
-add_quote:
-  alias: Add Quote
-  fields:
-    quotation:
-      description: The quote text
-    author:
-      description: The author of the quote
-    source:
-      description: The source of the quote
-  sequence:
-    - service: rest_command.add_quote
-      data:
-        quotation: "{{ quotation }}"
-        author: "{{ author }}"
-        source: "{{ source }}"
-    - service: input_text.set_value
-      target:
-        entity_id:
-          - input_text.quote_quotation
-          - input_text.quote_author
-          - input_text.quote_source
-      data:
-        value: ""
+alias: Submit Quote When Button Pressed
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - input_button.submit_quote
+condition: []
+action:
+  - service: rest_command.add_quote
+    data:
+      quotation: "{{ states('input_text.quote_quotation') }}"
+      author: "{{ states('input_text.quote_author') }}"
+      source: "{{ states('input_text.quote_source') }}"
+  - service: input_text.set_value
+    target:
+      entity_id:
+        - input_text.quote_quotation
+        - input_text.quote_author
+        - input_text.quote_source
+    data:
+      value: ""
+  - service: homeassistant.update_entity
+    target:
+      entity_id: sensor.current_quote
+mode: single
 ```
+
 **Quote of the day card**
 ```markdown
 type: markdown
