@@ -30,8 +30,8 @@ def addQuote():
 
     payload = request.get_json()
     quotation = payload.get("quotation")
-    source = payload.get("source")
-    author = payload.get("author")
+    source = payload.get("source") or ""
+    author = payload.get("author") or ""
     try:
         # Read existing quotes
         with open(QUOTES_FILE, 'r') as f:

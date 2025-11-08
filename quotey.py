@@ -1,5 +1,11 @@
 import sys
 import os
+import logging
+import epd2in13_V4
+import time
+from PIL import Image,ImageDraw,ImageFont
+import json
+import random
 
 fontdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
 libdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib')
@@ -7,15 +13,13 @@ QUOTES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'quotes.j
 CURRENT_QUOTE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'current_quote.json')
 if os.path.exists(libdir):
     sys.path.append(libdir)
+else:
+    logging.error("Lib directory not found")
+    raise FileNotFoundError("Lib directory not found")
 
-import logging
-import epd2in13_V4
-import time
-from PIL import Image,ImageDraw,ImageFont
-import traceback
-import json
-import random
-
+if not os.path.exists(QUOTES_FILE):
+    logging.error("Quotes file not found")
+    raise FileNotFoundError("Quotes file not found")
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -126,10 +130,16 @@ def clear_screen():
 
 def get_random_quote():
     #Load random quote from json
+    try:
         with open(QUOTES_FILE, 'r') as f:
             quotes = json.load(f)
-            quote = random.choice(quotes) 
-        return quote
+    except json.JSONDecodeError as e:
+        logging.error(f"Error decoding JSON from quotes file: {e}")
+        raise
+    if not quotes:
+        logging.error("No quotes available in the quotes file.")
+        raise ValueError("No quotes available in the quotes file.")
+    return random.choice(quotes)
 def show_quote():
     try:
         #Initialize and Clear e-Paper display
@@ -155,12 +165,22 @@ def show_quote():
         source = quote_object['source']
         author = quote_object['author']
 
+        #Construct quote origin string
+        if source and author:
+            origin = f"- {source} by {author}"
+        elif source:
+            origin = f"- {source}"
+        elif author:
+            origin = f"- {author}"
+        else:
+            origin = ""
+
         #Wrap text to fit screen
         quote_box = (0, 0, epd.height-5, epd.width-40)
         source_box = (0, epd.width - 35, epd.height-5, epd.width)
 
         wrapped_quote, quote_font = wrap_text(quotation, quote_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=24, min_font_size=12)
-        wrapped_source, source_font = wrap_text(f"- {source} by {author}", source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
+        wrapped_source, source_font = wrap_text(origin, source_box, os.path.join(fontdir, 'Font.ttc'), max_font_size=18, min_font_size=10)
 
         logging.info(f"Wrapped quote lines: {wrapped_quote}")
         draw_wrapped_text(draw, wrapped_quote, quote_box, quote_font, fill=0, line_spacing=1.2, align="center")
@@ -170,17 +190,17 @@ def show_quote():
     
         image = image.rotate(180) # Comment this line if your display is upside down
         epd.display(epd.getbuffer(image))
-        epd.sleep()
+        
         logging.info("Display complete")
-        epd2in13_V4.epdconfig.module_exit(cleanup=True)
-
 
     except IOError as e:
-        logging.info(e)
+        logging.info(f"IO Error: {e}")
     except KeyboardInterrupt:
         logging.info("ctrl + c:")
-        epd2in13_V4.epdconfig.module_exit()
-        exit()
+    
+    finally:
+        epd.sleep()
+        epd2in13_V4.epdconfig.module_exit(cleanup=True)
 
 if __name__ == "__main__":
     show_quote()
